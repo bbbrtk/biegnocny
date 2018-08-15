@@ -1,0 +1,87 @@
+{% extends "baza/wzor.html" %}
+
+{% block title %} Stelaz - Punkty {% endblock %}
+
+{% block content %}
+<div class="w3-responsive"> <table> <tr>
+    <td id="leftpanel">
+        <table id="leftpanel">
+            <tr>
+                <td  id="leftpanel">
+                    <div id="empty10_10"></div>
+                </td>
+            </tr>
+            <tr>
+                <td id="leftpanel">
+                    <img src="http://bieg-nocny.pl/assets/img/bn-inv.png"  align="center" width="120" height="60">
+                </td>
+            </tr>
+            <tr>
+                <td  id="leftpanel">
+                    <div id="empty10_10"></div>
+                </td>
+            </tr>
+            <tr>
+                <td id="leftpanel">
+                    <a target="_blank" rel="noopener noreferrer" href="/admin/baza/punkt" class="button">
+                        Edytuj punkty
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td id="leftpanel">
+                    <a href="/start" class="button">
+                        Wróć
+                    </a>
+                </td>
+            </tr>
+
+            <tr>
+            </tr>
+        </table>
+
+    </td>
+
+
+    <td >
+
+        <div id="empty"> </div>
+        <h1> Panel Administracyjny Biegu Nocnego </h1>
+        <div id="greyline_short"> </div>
+        <div id="empty"> </div>
+
+        <h2> Punkty </h2>
+        <table style="width:100%">
+        <tr>
+            <th id="memberstable" > id </th>
+            <th id="memberstable" > numer </th>
+            <th id="memberstable" > nazwa punktu </th>
+            <th id="memberstable" > adres </th>
+            <th id="memberstable"> podgląd </th>
+            <th id="memberstable"> edytuj </th>
+            <th id="memberstable" width="20%"> </th>
+
+        {% for Punkt in Punkty %}
+
+         <tr>
+             <td id="memberstable" >#{{Punkt.id}}</td>
+             <td id="memberstable" >{{Punkt.trasa}}{{ Punkt.numer }}</td>
+             <td id="memberstable">{{ Punkt.nazwa }}</td>
+             <td id="memberstable" > {{Punkt.adres}} </td>
+             <td width="10%" id="emptyspace">
+                <a  href="/punkty/{{Punkt.id}}" class="button3">
+                    podgląd
+                 </a>
+             </td>
+            <td width="10%" id="emptyspace">
+               <a  href="/admin/baza/punkt/{{Punkt.id}}/change/" class="button2">
+                   >>
+                </a></td>
+           <td width="20%" id="emptyspace"></td>
+           {% endfor %}
+         </tr>
+        </table>
+
+</td></tr></table></div>
+
+{%endblock%}

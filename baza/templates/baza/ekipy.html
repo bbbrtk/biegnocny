@@ -1,0 +1,142 @@
+{% extends "baza/wzor.html" %}
+{% load increment from tags %}
+{% block title %} Stelaz - Panel Administracyjny BN{% endblock %}
+
+{% block content %}
+<div class="w3-responsive"> <table> <tr>
+    <td id="leftpanel">
+        <table id="leftpanel">
+            <tr>
+                <td  id="leftpanel">
+                    <div id="empty10_10"></div>
+                </td>
+            </tr>
+            <tr>
+                <td id="leftpanel">
+                    <img src="http://bieg-nocny.pl/assets/img/bn-inv.png"  align="center" width="120" height="60">
+                </td>
+            </tr>
+            <tr>
+                <td  id="leftpanel">
+                    <div id="empty10_10"></div>
+                </td>
+            </tr>
+            <tr>
+                <td id="leftpanel">
+                    <a target="_blank" rel="noopener noreferrer" href="/admin/baza/ekipa" class="button">
+                        Edytuj informacje
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td id="leftpanel">
+                    <a target="_blank" rel="noopener noreferrer" href="/admin/baza/uczestnik" class="button">
+                        Edytuj uczestników
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td id="leftpanel">
+                    <a href="/ekipy" class="button">
+                        Odśwież
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td id="leftpanel">
+                    <a target="_blank" rel="noopener noreferrer"
+                    href="/pobierz_kopie"
+                    class="button">Pobierz</a>
+                </td>
+            </tr>
+            <tr>
+                <td id="leftpanel">
+                    <a href="/start" class="button">
+                        Wróć
+                    </a>
+                </td>
+            </tr>
+
+            <tr>
+            </tr>
+        </table>
+
+    </td>
+
+
+    <td >
+
+        <div id="empty"> </div>
+        <h1> Panel Administracyjny Biegu Nocnego </h1>
+        <div id="greyline_short"> </div>
+        <div id="empty"> </div>
+
+        <h2> Ekipy </h2>
+        <table style="width:100%">
+        <tr>
+            <th id="memberstable" >#</th>
+            <th id="memberstable" > id </th>
+            <th id="memberstable" > nazwa ekipy </th>
+            <th id="memberstable" > ilość </th>
+            <th id="memberstable" > płatność </th>
+            <th id="memberstable" > obecności </th>
+            <th id="memberstable" > zgody </th>
+            <th id="memberstable" > pakiet </th>
+            <th id="memberstable" > uwagi </th>
+            <th id="memberstable"> akcje </th>
+            <td id="memberstable" width="20%"> </td>
+
+        {% with numer=1 %}
+        {% for Ekipa in Ekipy %}
+
+         <tr>
+            <td id="memberstable" width="15%">{{Ekipa.lp}}</td>
+           <td id="memberstable" width="15%">{{Ekipa.trasa}}{{ Ekipa.id }}</td>
+           <td id="memberstable" width="5%">{{ Ekipa.nazwa }}</td>
+           <td id="memberstable" width="20%"> {{Ekipa.ile_osob}} </td>
+           {% if Ekipa.zgodnosc_wplat %}
+                <td  id="emptyspace"> <div  id="accept"> jest </div> </td>
+            {% else %}
+                <td  id="emptyspace"> <div id="warning"> brak </div></td>
+            {% endif %}
+
+            {% if Ekipa.obecnosci %}
+                 <td  id="emptyspace"> <div  id="accept"> obecni </div> </td>
+            {% else %}
+                 <td  id="emptyspace"> <div id="warning"> nieobecni </div></td>
+            {% endif %}
+
+            {% if Ekipa.weryfikacja_zgod %}
+                 <td  id="emptyspace"> <div  id="accept"> jest </div> </td>
+            {% else %}
+                 <td  id="emptyspace"> <div id="warning"> brak </div></td>
+            {% endif %}
+
+            {% if Ekipa.pakiet_startowy %}
+                 <td  id="emptyspace"> <div  id="accept"> wydano </div> </td>
+            {% else %}
+                 <td  id="emptyspace"> <div id="warning"> nie wydano </div></td>
+            {% endif %}
+
+           {% with uwagie=Ekipa.uwagi|length_is:"0"  %}
+               {% if uwagie %}
+                   <td  id="emptyspace"> <div  id="accept"> brak uwag </div> </td>
+               {% else %}
+                   <td  id="emptyspace"> <div  id="warning"> uwagi </div> </td>
+               {% endif %}
+            {% endwith %}
+
+           <td width="30%" id="emptyspace">
+               <a  href="ekipa/{{Ekipa.id}}" class="button2">
+                   >>
+                </a></td>
+           <td width="30%" id="emptyspace"></td>
+           {% endfor %}
+           {% endwith %}
+
+         </tr>
+        </table>
+
+</td></tr></table></div>
+
+{%endblock%}

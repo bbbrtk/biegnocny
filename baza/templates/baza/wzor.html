@@ -1,0 +1,17 @@
+{% load staticfiles %}
+
+{% csrf_token %}
+<!DOCTYPE html>
+
+<html>
+
+    <head>
+        <title> {% block title %}{% endblock title %} </title>
+        <link rel="stylesheet" type="text/css" href="{% static 'team.css' %}" >
+    </head>
+
+    <body>
+        {% block content %}{% endblock content %}
+    </body>
+
+</html>

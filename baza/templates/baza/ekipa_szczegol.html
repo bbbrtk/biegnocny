@@ -1,0 +1,324 @@
+{% extends "baza/wzor.html" %}
+
+{% block title %} Stelaz - {{ ekipa.nazwa }} {% endblock %}
+
+{% block content %}
+
+<div class="w3-responsive"> <table> <tr>
+    <td id="leftpanel">
+        <table id="leftpanel">
+            <tr>
+                <td  id="leftpanel">
+                    <div id="empty10_10"></div>
+                </td>
+            </tr>
+            <tr>
+                <td id="leftpanel">
+                    <img src="http://bieg-nocny.pl/assets/img/bn-inv.png"  align="center" width="120" height="60">
+                </td>
+            </tr>
+            <tr>
+                <td  id="leftpanel">
+                    <div id="empty10_10"></div>
+                </td>
+            </tr>
+            <tr>
+                <td id="leftpanel">
+                    <a target="_blank" rel="noopener noreferrer" href="/admin/baza/ekipa/{{ekipa.id}}/change/" class="button">
+                        Edytuj ekipę
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td id="leftpanel">
+                    <a href="/ekipa/{{ekipa.id}}" class="button">
+                        Odśwież
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td id="leftpanel">
+                    <a href="/start" class="button">
+                        Wróć
+                    </a>
+                </td>
+            </tr>
+
+            <tr>
+            </tr>
+        </table>
+
+    </td>
+
+
+    <td >
+
+        <div id="empty"> </div>
+        <h1> Panel Administracyjny Biegu Nocnego </h1>
+        <div id="greyline_short"> </div>
+        <div id="empty"> </div>
+
+        <h2> Informacje </h2>
+
+        <table style="width:100%">
+             <tr>
+                  <td id="boldtable">nazwa</td>
+                  <td id="emptytable">{{ ekipa.nazwa }}</td>
+                  <td id="emptyspace"></td>
+            </tr>
+            <tr>
+                  <td id="boldtable">ID</td>
+                  <td id="emptytable">{{ ekipa.trasa }}{{ekipa.id}}</td>
+                  <td id="emptyspace"></td>
+            </tr>
+            <tr>
+                 <td id="boldtable">patrolowy</td>
+                 {% for Uczestnik in Uczestnicy %}
+                 {% if Uczestnik.czy_patrolowy %}
+                 <td id="emptytable">{{ Uczestnik.imie_nazwisko }}</td>
+                 {% endif %}
+                 {% endfor %}
+                 <td id="emptyspace"></td>
+            </tr>
+            <tr>
+                 <td id="boldtable">email</td>
+                 {% for Uczestnik in Uczestnicy %}
+                 {% if Uczestnik.czy_patrolowy %}
+                 <td id="emptytable">{{ Uczestnik.mail }}</td>
+                 {% endif %}
+                 {% endfor %}
+                 <td id="emptyspace"></td>
+            </tr>
+            <tr>
+                 <td id="boldtable">telefon</td>
+                 <td id="emptytable">{{ ekipa.telefon }}</td>
+                 <td id="emptyspace"></td>
+            </tr>
+            <tr>
+                 <td id="boldtable">trasa</td>
+                 <td id="emptytable">{{ ekipa.trasa }}</td>
+                 <td id="emptyspace"></td>
+            </tr>
+        </table>
+
+        <div id="empty" > </div>
+
+
+
+
+        <div id="empty"> </div>
+        <div id="greyline"> </div>
+
+        <h2> Członkowie </h2>
+        <table style="width:100%">
+        <tr>
+            <th id="memberstable" > imię i nazwisko </th>
+            <th id="memberstable" > pesel </th>
+            <th id="memberstable" > adres </th>
+            <th id="memberstable" > obecność</th>
+            <th id="memberstable" >udział</th>
+            <th id="memberstable"> edytuj</th>
+
+         {% for Uczestnik in Uczestnicy %}
+         <tr>
+           <td id="memberstable" width="15%">{{ Uczestnik.imie_nazwisko }}</td>
+           <td id="memberstable" width="5%">{{ Uczestnik.pesel }}</td>
+           <td id="memberstable" width="20%">{{ Uczestnik.adres }}</td>
+           {% if Uczestnik.obecnosc %}
+               <td  id="emptyspace"> <div  id="accept"> obecny </div> </td>
+               {% else %}
+               <td  id="emptyspace"> <div id="warning"> nieobecny </div></td>
+           {% endif %}
+           {% if Uczestnik.zgoda_na_udzial %}
+                <td  id="emptyspace"> <div  id="accept"> zgoda </div> </td>
+               {% else %}
+               <td  id="emptyspace"> <div id="warning"> brak </div></td>
+           {% endif %}
+
+           <td width="30%" id="emptyspace">
+               <a target="_blank" rel="noopener noreferrer" href="/admin/baza/uczestnik/{{Uczestnik.id}}/change/" class="button2">
+                   >>
+                </a></td>
+           <td width="30%" id="emptyspace"></td>
+           {% endfor %}
+
+         </tr>
+        </table>
+
+        <div id="empty"> </div>
+        <div id="greyline"> </div>
+        <h2> Finanse </h2>
+
+        <table style="width:60%">
+             <tr>
+                  <td >do zapłaty</td>
+                  <td>{{ ekipa.do_zaplaty }}</td>
+            </tr>
+            <tr>
+                  <td>zapłacono</td>
+                  <td>
+                      <b>{{ ekipa.zaplacono }}     -     </b>
+                      <a target="_blank" rel="noopener noreferrer" href="/admin/baza/ekipa/{{ekipa.id}}/change#id_zaplacono" class="button2">
+                        edytuj
+                        </a>
+                    </td>
+            </tr>
+            <tr>
+                 <td>zapłacono na osobę</td>
+                 <td >{{ ekipa.zaplacono_na_osobe }}</td>
+            </tr>
+            <tr>
+                 <td>pozostało</td>
+                 <td>{{ ekipa.pozostalo }}</td>
+            </tr>
+            <tr>
+                 <td>termin wpłat</td>
+                 {% for Terminy in Termin %}
+                      <td >{{ Terminy }}</td>
+                 {% endfor %}
+            </tr>
+            <tr>
+                 <td>zgodność wpłat</td>
+                 <td>
+                     {% if ekipa.zgodnosc_wplat %}
+                     <div id="accept">zgodne </div>
+                     {% else %}
+                     <div id="warning">brak</div>
+                     {% endif %}
+                 </td>
+            </tr>
+        </table>
+        <div id="empty"> </div>
+        <div id="greyline"> </div>
+
+        <h2> Dokumenty </h2>
+
+        <table style="width:60%">
+            <tr>
+                 <td>obecności</td>
+                 <td>
+                     {% if ekipa.obecnosci %}
+                     <div id="accept">obecni</div>
+                     {% else %}
+                     <div id="warning">brak</div>
+                     {% endif %}
+                 </td>
+            </tr>
+            <tr>
+                 <td>weryfikacja zgód</td>
+                 <td>
+                     {% if ekipa.weryfikacja_zgod %}
+                     <div id="accept">zgodne</div>
+                     {% else %}
+                     <div id="warning">brak</div>
+                     {% endif %}
+                 </td>
+            </tr>
+            <tr>
+                 <td>oświadczenie patrolowego</td>
+                 <td>
+                     {% if ekipa.oswiadczenie_patrolowego %}
+                     <div id="accept">wydano</div>
+                     {% else %}
+                     <div id="warning">brak</div>
+                     {% endif %}
+                 </td>
+            </tr>
+
+            <tr>
+                 <td>pakiet startowy</td>
+                 <td>
+                     {% if ekipa.pakiet_startowy %}
+                     <div id="accept"> wydano </div>
+                     {% else %}
+                     <div id="warning">brak</div>
+                     {% endif %}
+                 </td>
+            </tr>
+            <tr>
+                 <td>uwagi</td>
+                 <td>{{ ekipa.uwagi }}</td>
+            </tr>
+        </table>
+
+
+        <div id="empty"> </div>
+        <div id="greyline"> </div>
+
+        <h2> Punkty na biegu </h2>
+        <table style="width:60%">
+            <tr>
+                <td> Kwadrat startowy</td>
+                {% for Kwadrat in Kwadrat %}
+                     <td >{{ Kwadrat }}</td>
+                {% endfor %}
+            <tr>
+            <tr>
+                <td> Punkt startowy</td>
+                {% for Punkt in PunktStartowy %}
+                     <td >{{ Punkt }}</td>
+                {% endfor %}
+            <tr>
+                <td id="emptyspace">
+                    <div id="empty10_10">
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <th> id punktu </th>
+                <th> nazwa punktu </th>
+                <th> edytuj </th>
+            </tr>
+         {% for Punkt in ZaliczonyPunkt %}
+             <tr>
+               <td>p_{{ Punkt.punkt.trasa }}_{{ Punkt.punkt.numer }}</td>
+               <td>{{ Punkt.punkt.nazwa }}</td>
+               <td >
+                   <a target="_blank" rel="noopener noreferrer" href="/admin/baza/zaliczonypunkt/{{Punkt.id}}/change/" class="button2">
+                       >>
+                    </a></td>
+               {% endfor %}
+             </tr>
+             <tr>
+                 <td  id="emptyspace">
+                     <div id="empty10_10"></div>
+                     <a target="_blank" rel="noopener noreferrer" href="/admin/baza/ekipa/{{ekipa.id}}/change#add_id_punkty_bieg" class="button3">
+                         Dodaj punkt
+                      </a>
+                  </td>
+            </tr>
+        </table>
+
+        <div id="empty"> </div>
+        <div id="greyline"> </div>
+
+        <h2> Klasyfikacja </h2>
+        <table style="width:50%">
+            <tr>
+                <td> Test Początkowy </td>
+                <td> {{ekipa.test_poczatkowy}} </td>
+           </tr>
+           <tr>
+             <td> Punkty za trasę</td>
+             <td> {{ ekipa.punkty_za_trase }}</td>
+           </tr>
+           <tr>
+             <td> Punkty za odpowiedzi</td>
+             <td> {{ ekipa.punkty_za_odpowiedzi }}</td>
+           </tr>
+             <tr>
+               <td> Punkty Ujemne </td>
+               <td>- {{ ekipa.punkty_ujemne }}</td>
+             </tr>
+
+             <tr>
+               <td><b> Wynik końcowy</b></td>
+               <td><b> {{ ekipa.wynik_koncowy }}</b></td>
+             </tr>
+
+
+        </table>
+
+</td></tr></table></div>
+
+{%endblock%}

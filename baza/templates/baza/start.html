@@ -1,0 +1,128 @@
+{% extends "baza/wzor.html" %}
+{% load increment from tags %}
+{% block title %} Stelaz - Panel Administracyjny BN{% endblock %}
+
+{% block content %}
+<div class="w3-responsive"> <table> <tr>
+    <td id="leftpanel">
+        <table id="leftpanel">
+            <tr>
+                <td  id="leftpanel">
+                    <div id="empty10_10"></div>
+                </td>
+            </tr>
+            <tr>
+                <td id="leftpanel">
+                    <img src="http://bieg-nocny.pl/assets/img/bn-inv.png"  align="center" width="120" height="60">
+                </td>
+            </tr>
+            <tr>
+                <td  id="leftpanel">
+                    <div id="empty10_10"></div>
+                </td>
+            </tr>
+            <tr>
+                <td id="leftpanel">
+                    <a href="/ekipy" class="button">
+                        Ekipy
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td id="leftpanel">
+                    <a href="/punktyHS" class="button">
+                        Punkty HS
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td id="leftpanel">
+                    <a href="/punktyW" class="button">
+                        Punkty W
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td id="leftpanel">
+                    <a href="/punktyR" class="button">
+                        Punkty R
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td id="leftpanel">
+                    <a target="_blank" rel="noopener noreferrer" href="/admin/baza" class="button">
+                        Edycja
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td id="leftpanel">
+                    <a href="login/" class="button">
+                        Wyjście
+                    </a>
+                </td>
+            </tr>
+        </table>
+    </td>
+
+
+    <td >
+
+        <div id="empty"> </div>
+        <h1> Panel Administracyjny Biegu Nocnego </h1>
+        <div id="greyline_short"> </div>
+        <div id="empty"> </div>
+
+            <table id="memberstable2" >
+                <tr>
+                    <td width="5%"> <b> Komendant </b> </td>
+                    <td width="20%"> Michał Domeracki </td>
+                    <td width="20%">  001 001 001 </td>
+                    <td width="20%"> abc@gmail.com </td>
+                    <td width="35%">  </td>
+                </tr>
+                <tr>
+                    <td> <b> Strona </b> </td>
+                    <td> Bartek Sobkowiak </td>
+                    <td>  001 001 001 </td>
+                    <td>  abc@gmail.com </td>
+                </tr>
+                <tr>
+                    <td> <b> Trasy </b> </td>
+                    <td> Toni Janas </td>
+                    <td>  001 001 001 </td>
+                    <td>  abc@gmail.com </td>
+                </tr>
+                <tr>
+                    <td> <b> Punkty </b> </td>
+                    <td> Jakub Ciemięga </td>
+                    <td>  001 001 001 </td>
+                    <td>  abc@gmail.com </td>
+                </tr>
+                <tr>
+                    <td> <b> Biuro </b> </td>
+                    <td> Dorota Goraj </td>
+                    <td>  001 001 001 </td>
+                    <td>  abc@gmail.com </td>
+                </tr>
+                <tr>
+                    <td> <b> PR </b> </td>
+                    <td> Aga Łajs </td>
+                    <td>  001 001 001 </td>
+                    <td>  abc@gmail.com </td>
+                </tr>
+                <tr>
+                    <td> <b> Kwatermistrzostwo </b> </td>
+                    <td> Kris Sobkowiak </td>
+                    <td>  001 001 001 </td>
+                    <td>  abc@gmail.com </td>
+                </tr>
+            </table>
+
+
+
+
+</td></tr></table></div>
+
+{%endblock%}

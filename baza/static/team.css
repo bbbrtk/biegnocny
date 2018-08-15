@@ -1,0 +1,273 @@
+body {
+    background-color: white;
+}
+
+td {
+    border-bottom: 1px solid #7a8289;
+    font-family: Cambria, Arial;
+    text-align: left;
+    padding: 1px;
+    width: 10%;
+}
+
+th {
+    border-bottom: 1px solid #002344;
+    font-family: Cambria, Arial;
+    font-weight: bold;
+    text-align: left;
+    padding: 3px;
+}
+
+h1 {
+    color: #002344;
+    font-family: Cambria, Arial;
+    font-size: 20px;
+}
+
+
+h2 {
+    color: white;
+    background-color: #002344;
+    font-family: Cambria, Arial;
+    font-size: 16px;
+    border-radius: 4px;
+    width: 140px;
+    height: 22px;
+    padding: 4px 4px;
+    text-align: center;
+}
+
+p {
+    color: #002344;
+    background-color: white;
+    border-color: #002344;
+    font-family: Cambria, Arial;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px;
+    width: 160px;
+    height: 24px;
+    padding: 2px 2px;
+    text-align: center;
+}
+
+img {
+    display: block;
+    margin-left: 40px;
+    margin-right: 10px;
+}
+
+a.button {
+    -webkit-appearance: button;
+    -moz-appearance: button;
+    appearance: button;
+
+    background-color: #002344;
+    border: 2px solid #002344;
+    color: #f9f9f9;
+    border-radius: 4px;
+    padding: 8px 16px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 2px 1px;
+    -webkit-transition-duration: 0.2s;
+    transition-duration: 0.2s;
+    cursor: pointer;
+    width: 150px
+}
+
+a.button:hover {
+    background-color: #000e1c;
+    color: white;
+}
+
+a.button2 {
+    -webkit-appearance: button;
+    -moz-appearance: button;
+    appearance: button;
+
+    background-color: #002344;
+    color: #f9f9f9;
+    border-radius: 4px;
+    padding: 1px 8px;
+    text-align: left;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 1px 1px;
+    -webkit-transition-duration: 0.2s;
+    transition-duration: 0.2s;
+    cursor: pointer;
+    width: auto;
+}
+
+a.button2:hover {
+    background-color: #000e1c;
+    color: white;
+}
+
+a.button3 {
+    -webkit-appearance: button;
+    -moz-appearance: button;
+    appearance: button;
+
+    background-color: #15752b;
+    color: #f9f9f9;
+    border-radius: 4px;
+    padding: 2px 8px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 1px 1px;
+    -webkit-transition-duration: 0.2s;
+    transition-duration: 0.2s;
+    cursor: pointer;
+    width: 100px;
+}
+
+a.button3:hover {
+    background-color: #000e1c;
+    color: white;
+}
+
+#empty {
+    width:900px;
+    height:15px;
+}
+
+#empty10_50 {
+    width:10px;
+    height:50px;
+}
+
+#empty10_10 {
+    width:10px;
+    height:10px;
+}
+
+#blueline {
+    width:900px;
+    height:2px;
+    background-color: #002344;
+}
+
+#greyline {
+    width:900px;
+    height:2px;
+    background-color: #ededed;
+}
+
+#greyline_short {
+    width:450px;
+    height:2px;
+    background-color: #ededed;
+}
+
+#warning {
+    background-color: #af0c0c;
+    color: #f9f9f9;
+    font-family: Cambria, Arial;
+    font-weight: bold;
+    font-size: 14px;
+    width:80px;
+    height:18px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+#accept {
+    background-color: #15752b;
+    color: white;
+    font-family: Cambria, Arial;
+    font-weight: bold;
+    font-size: 14px;
+    width:80px;
+    height:18px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+#leader {
+    background-color: #002344;
+    color: white;
+    font-family: Cambria, Arial;
+    font-weight: bold;
+    font-size: 14px;
+    width:80px;
+    height:18px;
+    border-radius: 4px;
+    text-align: center;
+}
+
+#header {
+    color: white;
+    background-color: #002344;
+    font-family: Cambria, Arial;
+    font-size: 16px;
+    border-radius: 4px;
+    width: auto;
+    height: 22px;
+    padding: 4px 4px;
+    text-align: center;
+}
+
+#boldtable {
+    font-weight: bold;
+    border-bottom: None;
+    text-align: left;
+    width: 10%;
+}
+#emptytable {
+    border-bottom: None;
+    font-size: 18px;
+    font-family: Cambria, Arial;
+    text-align: left;
+    width: 40%;
+}
+
+#emptyspace {
+    border-bottom: None;
+    font-family: Cambria, Arial;
+    text-align: left;
+    width: auto;
+}
+
+#basetable {
+    border-bottom: None;
+    font-family: Cambria, Arial;
+    text-align: left;
+    width: 10%;
+}
+
+#memberstable {
+    border-bottom: 1px solid #7a8289;
+    font-family: Cambria, Arial;
+    text-align: left;
+    padding: 4px 2px;
+    width: auto;
+}
+
+#memberstable2 {
+    border-bottom: 1px solid #7a8289;
+    font-family: Cambria, Arial;
+    text-align: left;
+    padding: 4px 2px;
+}
+
+#pointtable {
+    border: 1px solid black;
+    font-family: Cambria, Arial;
+    text-align: center;
+    padding: 4px 2px;
+}
+
+#leftpanel {
+    border-bottom: None;
+    font-family: Cambria, Arial;
+    text-align: left;
+    vertical-align: top;
+    align: center;
+}

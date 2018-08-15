@@ -1,0 +1,18 @@
+{% extends "baza/wzor.html" %}
+
+{% block title %} Stelaż - Login {% endblock %}
+
+{% block content %}
+
+        <div id="header">stelaz.bieg-nocny.pl</div>
+        <div id="empty10_10"></div>
+        <div align="center">
+            <img src="http://bieg-nocny.pl/assets/img/bn-inv.png"  align="center" width="120" height="60">
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit">Zaloguj</button>
+            </form>
+        </div>
+
+{%endblock%}
