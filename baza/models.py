@@ -115,6 +115,9 @@ class Ekipa(models.Model):
         ('HS', 'Starszoharcerska'),
         ('W', 'Wedrownicza'),
         ('R', 'Rowerowa'),)
+    PUNKTY = (
+        (Punkt_W, 'P Wedrownicza'),
+        (Punkt_R, 'P Rowerowa'),)
 
     # podstawowe informacje
     nazwa =  models.CharField(max_length=64,default='')
@@ -144,6 +147,7 @@ class Ekipa(models.Model):
     kwadrat_startowy = models.ManyToManyField(Kwadrat, blank=True)
     punkt_startowy = models.ManyToManyField(Punkt_HS, blank=True)
     punkty_bieg = models.ManyToManyField(Zgloszenie_HS, blank=True)
+    #
     # punkty
     test_poczatkowy = models.IntegerField(default=0)
     punkty_za_trase = models.IntegerField(default=0)
@@ -158,17 +162,34 @@ class Ekipa(models.Model):
         ordering = ('id',)
 
 
+class Ekipa_HS (Ekipa):
+    trasy =  models.CharField(max_length=2, default='HS', blank=True)
+
+class Ekipa_W (Ekipa):
+    trasy =  models.CharField(max_length=2, default='W', blank=True)
+
+class Ekipa_R (Ekipa):
+    trasy =  models.CharField(max_length=2, default='R', blank=True)
+
+
 class Profile (models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True)
     class Meta:
         permissions = (
-            ('WidokGlowny', 'Dostęp do strony głównej'),
-            ('Punkty', 'Wyświetlanie punktów'),
-            ('PunktyHS', 'HS Wyświetlanie punktów'),
-            ('PunktyW', 'W Wyświetlanie punktów'),
-            ('PunktyR', 'R Wyświetlanie punktów'),
-            ('Kwadraty', 'Wyświetlanie kwadratów'),
-            ('Ekipy', 'Wyświetlanie szczegółów ekip'),
+            ('WidokGlowny', 'Strona Główna'),
+
+            ('Punkty', 'Wszystkie punkty'),
+            ('PunktyHS', 'HS punkty'),
+            ('PunktyW', 'W punkty '),
+            ('PunktyR', 'R punkty '),
+
+            ('Kwadraty', 'Kwadraty'),
+
+            ('Ekipy', 'Wszystkie ekipy '),
+            ('EkipyHS', 'HS ekipy '),
+            ('EkipyW', 'W ekipy '),
+            ('EkipyR', 'R ekipy'),
+
             ('Uczestnicy', 'Wyświetlanie uczestników'),
         )
 

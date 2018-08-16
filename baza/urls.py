@@ -6,6 +6,9 @@ urlpatterns = [
     path("start",views.otworz_widok_glowny),
 
     path("ekipy",views.otworz_ekipy),
+    path("ekipyHS", views.otworz_ekipy_HS),
+    path("ekipyW", views.otworz_ekipy_W),
+    path("ekipyR", views.otworz_ekipy_R),
     path("ekipa/<int:team_id>", views.otworz_szczegoly_ekipy),
 
     path("punktyHS",views.otworz_punkty_HS),

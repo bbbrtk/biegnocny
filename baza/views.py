@@ -3,21 +3,13 @@ from django.http import Http404, HttpResponse
 from django.contrib.auth.decorators import user_passes_test
 from django.conf import settings
 
-import xlwt, os, ftplib
+import xlwt, os
 
 from .models import *
 
 
-"""
-def download(filename):
-    with ftplib.FTP('94.152.53.137', 'bartek', 'Cervia*5111') as ftp:
-        ftp.cwd('/bartoszsobkowiak')
-        with open(filename, 'wb') as f:
-            ftp.retrbinary('RETR ' + filename, f.write)
-
-"""
-
 def pobierz_kopie(request):
+    eksportuj_wszystko(request)
     file_path = '/home/bartoszsobkowiak/biegnocny/kopia_zapasowa.xls'
     if os.path.exists(file_path):
         with open(file_path, 'rb') as fh:
@@ -112,14 +104,14 @@ def eksportuj_wszystko(request):
     arkusz.save("kopia_zapasowa.xls")
 
 
-def odswiez_widok(request, team_id):
+def odswiez_widok(request, team_id, ekipy):
     try:
         weryfikacja_zgod_ekipy = True
         obecnosci_ekipy = True
         ile_osob = 0
         termin_kwota = 0
         punkty_ujemne_suma = 0
-        ekipa = Ekipa.objects.get(pk=team_id)
+        ekipa = ekipy.objects.get(pk=team_id)
 
         for i in ekipa.czlonkowie.all():
             ile_osob=ile_osob+1
@@ -137,27 +129,34 @@ def odswiez_widok(request, team_id):
             if i.zawieszenie:
                 punkty_ujemne_suma += 2
 
-        Ekipa.objects.filter(pk=team_id).update(ile_osob=ile_osob)
-        Ekipa.objects.filter(pk=team_id).update(do_zaplaty=termin_kwota*ile_osob)
-        Ekipa.objects.filter(pk=team_id).update(pozostalo=ekipa.do_zaplaty-ekipa.zaplacono)
+        ekipy.objects.filter(pk=team_id).update(ile_osob=ile_osob)
+        ekipy.objects.filter(pk=team_id).update(do_zaplaty=termin_kwota*ile_osob)
+        ekipy.objects.filter(pk=team_id).update(pozostalo=ekipa.do_zaplaty-ekipa.zaplacono)
 
         if (ekipa.pozostalo==0):
-            Ekipa.objects.filter(pk=team_id).update(zgodnosc_wplat=True)
+            ekipy.objects.filter(pk=team_id).update(zgodnosc_wplat=True)
         else:
-            Ekipa.objects.filter(pk=team_id).update(zgodnosc_wplat=False)
+            ekipy.objects.filter(pk=team_id).update(zgodnosc_wplat=False)
 
-        Ekipa.objects.filter(pk=team_id).update(obecnosci=obecnosci_ekipy)
-        Ekipa.objects.filter(pk=team_id).update(weryfikacja_zgod=weryfikacja_zgod_ekipy)
-        Ekipa.objects.filter(pk=team_id).update(punkty_ujemne=punkty_ujemne_suma)
+        ekipy.objects.filter(pk=team_id).update(obecnosci=obecnosci_ekipy)
+        ekipy.objects.filter(pk=team_id).update(weryfikacja_zgod=weryfikacja_zgod_ekipy)
+        ekipy.objects.filter(pk=team_id).update(punkty_ujemne=punkty_ujemne_suma)
 
         wynik_koncowy_suma = ekipa.test_poczatkowy+ekipa.punkty_za_trase+ekipa.punkty_za_odpowiedzi-punkty_ujemne_suma
-        Ekipa.objects.filter(pk=team_id).update(wynik_koncowy=wynik_koncowy_suma)
+        ekipy.objects.filter(pk=team_id).update(wynik_koncowy=wynik_koncowy_suma)
 
-        Ekipa.objects.filter(pk=team_id).update(zaplacono_na_osobe=ekipa.zaplacono/ekipa.ile_osob)
+        ekipy.objects.filter(pk=team_id).update(zaplacono_na_osobe=ekipa.zaplacono/ekipa.ile_osob)
 
-    except Ekipa.DoesNotExist:
+    except ekipy.DoesNotExist:
         raise Http404("Team does not exist")
     return ekipa
+
+
+@user_passes_test(lambda u: u.has_perm('baza.WidokGlowny'))
+def otworz_widok_glowny(request):
+    context = {
+    }
+    return render(request, "baza/start.html", context)
 
 
 @user_passes_test(lambda u: u.has_perm('baza.Ekipy'))
@@ -166,7 +165,9 @@ def otworz_ekipy(request):
     for i in Ekipa.objects.all():
         iter = iter + 1
         Ekipa.objects.filter(pk=i.id).update(lp=iter)
-        odswiez_widok(request, i.id)
+        # !!!
+        ekipy = Ekipa
+        odswiez_widok(request, i.id, ekipy)
     context = {
         "Uczestnik":Uczestnik.objects.all(),
         "Ekipy":Ekipa.objects.all()
@@ -174,17 +175,46 @@ def otworz_ekipy(request):
     return render(request, "baza/ekipy.html", context)
 
 
-@user_passes_test(lambda u: u.has_perm('baza.WidokGlowny'))
-def otworz_widok_glowny(request):
-    eksportuj_wszystko(request)
+@user_passes_test(lambda u: u.has_perm('baza.Ekipy'))
+def otworz_ekipy_trasa(request, trasy):
+    if trasy=='HS':
+        ekipy = Ekipa_HS
+    elif trasy=='W':
+        ekipy = Ekipa_W
+    elif trasy=='R':
+        ekipy = Ekipa_R
+
+    iter = 0
+    for i in ekipy.objects.all():
+        iter = iter + 1
+        ekipy.objects.filter(pk=i.id).update(lp=iter)
+        odswiez_widok(request, i.id, ekipy)
     context = {
+        "Uczestnik":Uczestnik.objects.all(),
+        "Ekipy":ekipy.objects.all()
     }
-    return render(request, "baza/start.html", context)
+    return render(request, "baza/ekipy.html", context)
+
+
+@user_passes_test(lambda u: u.has_perm('baza.EkipyHS'))
+def otworz_ekipy_HS(request):
+    return otworz_ekipy_trasa(request, 'HS')
+
+
+@user_passes_test(lambda u: u.has_perm('baza.EkipyW'))
+def otworz_ekipy_W(request):
+    return otworz_ekipy_trasa(request, 'W')
+
+
+@user_passes_test(lambda u: u.has_perm('baza.EkipyR'))
+def otworz_ekipy_R(request):
+    return otworz_ekipy_trasa(request, 'R')
 
 
 @user_passes_test(lambda u: u.has_perm('baza.Ekipy'))
 def otworz_szczegoly_ekipy(request, team_id):
-    ekipa = odswiez_widok(request, team_id)
+    ekipy = Ekipa
+    ekipa = odswiez_widok(request, team_id, ekipy)
     context = {
         "ekipa": ekipa,
         "Uczestnik":Uczestnik.objects.all(), # wszyscy uczestnicy
