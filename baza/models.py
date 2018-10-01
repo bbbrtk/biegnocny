@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-#class punkty startowe?
+
 
 class Punkt (models.Model):
     id =  models.AutoField(primary_key=True)
@@ -20,6 +20,7 @@ class Punkt (models.Model):
     pytanie = models.CharField(max_length=256, blank=True)
     odpowiedz = models.CharField(max_length=256, blank=True)
     dojscie = models.CharField(max_length=256, blank=True)
+    foto = models.ImageField(blank=True, upload_to='baza/static/foto/', default='baza/static/foto/{self.id}.jpg')
 
     punktowy = models.CharField(max_length=64, blank=True)
     uwagi = models.CharField(max_length=256, blank=True)

@@ -2,15 +2,39 @@ from django.shortcuts import render, redirect
 from django.http import Http404, HttpResponse
 from django.contrib.auth.decorators import user_passes_test
 from django.conf import settings
+from xlrd import open_workbook
 
 import xlwt, os
 
 from .models import *
 
+# !!!
+def tworz_punkt():
+    wb = open_workbook("ex.xls")
+    s = wb.sheet_by_index(0)
+    data_dict = {
+    'numer' : s.cell(0,0).value,
+    'kod' : s.cell(0,1).value,
+    'nazwa' : s.cell(0,2).value
+    }
+    punkt1 = Punkt(**data_dict)
+    punkt1.save()
+
 
 def pobierz_kopie(request):
     eksportuj_wszystko(request)
     file_path = '/home/bartoszsobkowiak/biegnocny/kopia_zapasowa.xls'
+    if os.path.exists(file_path):
+        with open(file_path, 'rb') as fh:
+            response = HttpResponse(fh.read(), content_type="application/vnd.ms-excel")
+            response['Content-Disposition'] = 'inline; filename=' + os.path.basename(file_path)
+            return response
+    raise Http404
+
+
+def pobierz_punkty(request, trasa):
+    eksportuj_punkty(request, trasa)
+    file_path = '/home/bartoszsobkowiak/biegnocny/punkty_' + trasa + '.xls'
     if os.path.exists(file_path):
         with open(file_path, 'rb') as fh:
             response = HttpResponse(fh.read(), content_type="application/vnd.ms-excel")
@@ -102,6 +126,40 @@ def eksportuj_wszystko(request):
         eksportuj(arkusz, nazwy[num], obiekty[num], listy[num])
 
     arkusz.save("kopia_zapasowa.xls")
+
+
+def eksportuj_punkty(request, trasa):
+    arkusz = xlwt.Workbook()
+    if trasa=='HS':
+        obiekty = (
+        Punkt_HS.objects.all(),
+        )
+    elif trasa=='W':
+        obiekty = (
+        Punkt_W.objects.all(),
+        )
+    elif trasa=='R':
+        obiekty = (
+        Punkt_R.objects.all(),
+        )
+    nazwy = (
+        "Punkty",
+        )
+    listaPunkt = (
+        'id','trasa','numer','kod',
+        'nazwa','skrzyzowanie',
+        'adres', 'opis_zawieszenia_1', 'opis_zawieszenia_2',
+        'opis', 'pytanie', 'odpowiedz',
+        'dojscie', 'punktowy', 'uwagi'
+        )
+    listy = (
+        listaPunkt
+        )
+
+    for num in range(len(nazwy)):
+        eksportuj(arkusz, nazwy[num], obiekty[num], listy[num])
+    savename = "punkty_" + trasa + ".xls"
+    arkusz.save(savename)
 
 
 def odswiez_widok(request, team_id, ekipy):
@@ -229,6 +287,7 @@ def otworz_szczegoly_ekipy(request, team_id):
 
 @user_passes_test(lambda u: u.has_perm('baza.PunktyHS'))
 def otworz_punkty_HS(request):
+    tworz_punkt()
     context = {
         "Punkty":Punkt_HS.objects.all(),
         }

@@ -19,7 +19,7 @@ urlpatterns = [
     path("kwadraty",views.otworz_kwadraty),
 
     #path("pobierz_kopie",views.pobierz_kopie),
-
+    #path("pobierz_kopie/<str:trasa>",views.pobierz_punkty),
     path('', include('django.contrib.auth.urls')),
 
 ]
