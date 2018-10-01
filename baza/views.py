@@ -1,13 +1,10 @@
-# komentarz 1 2 3
-
 from django.shortcuts import render, redirect
 from django.http import Http404, HttpResponse
 from django.contrib.auth.decorators import user_passes_test
 from django.conf import settings
+
 from xlrd import open_workbook
-
 import xlwt, os
-
 from .models import *
 
 # !!!
@@ -47,8 +44,8 @@ def pobierz_punkty(request, trasa):
 
 def eksportuj(arkusz, nazwa, obiekty, lista):
     strona = arkusz.add_sheet(nazwa)
-    row = 0
-    col = 0
+    row, col = 0
+
     for atrybut in lista:
         strona.write(row, col, atrybut)
         col += 1
@@ -132,18 +129,12 @@ def eksportuj_wszystko(request):
 
 def eksportuj_punkty(request, trasa):
     arkusz = xlwt.Workbook()
-    if trasa=='HS':
-        obiekty = (
-        Punkt_HS.objects.all(),
-        )
-    elif trasa=='W':
-        obiekty = (
-        Punkt_W.objects.all(),
-        )
-    elif trasa=='R':
-        obiekty = (
-        Punkt_R.objects.all(),
-        )
+
+    switcher = {
+        'HS': Punkt_HS.objects.all(),
+        'W': Punkt_W.objects.all(),
+        'R': Punkt_R.objects.all()
+        }
     nazwy = (
         "Punkty",
         )
@@ -158,23 +149,23 @@ def eksportuj_punkty(request, trasa):
         listaPunkt
         )
 
+    obiekty = switcher[trasa]
+
     for num in range(len(nazwy)):
         eksportuj(arkusz, nazwy[num], obiekty[num], listy[num])
+
     savename = "punkty_" + trasa + ".xls"
     arkusz.save(savename)
 
 
 def odswiez_widok(request, team_id, ekipy):
     try:
-        weryfikacja_zgod_ekipy = True
-        obecnosci_ekipy = True
-        ile_osob = 0
-        termin_kwota = 0
-        punkty_ujemne_suma = 0
+        weryfikacja_zgod_ekipy = obecnosci_ekipy = True
+        ile_osob = termin_kwota = punkty_ujemne_suma = 0
         ekipa = ekipy.objects.get(pk=team_id)
 
         for i in ekipa.czlonkowie.all():
-            ile_osob=ile_osob+1
+            ile_osob += 1
             if not i.zgoda_na_udzial:
                 weryfikacja_zgod_ekipy = False
             if not i.obecnosc:
@@ -189,23 +180,29 @@ def odswiez_widok(request, team_id, ekipy):
             if i.zawieszenie:
                 punkty_ujemne_suma += 2
 
-        ekipy.objects.filter(pk=team_id).update(ile_osob=ile_osob)
-        ekipy.objects.filter(pk=team_id).update(do_zaplaty=termin_kwota*ile_osob)
-        ekipy.objects.filter(pk=team_id).update(pozostalo=ekipa.do_zaplaty-ekipa.zaplacono)
+        ekipy.objects.filter(pk=team_id).update(
+            ile_osob=ile_osob,
+            do_zaplaty=termin_kwota*ile_osob,
+            pozostalo=ekipa.do_zaplaty-ekipa.zaplacono,
+            obecnosci=obecnosci_ekipy,
+            weryfikacja_zgod=weryfikacja_zgod_ekipy,
+            punkty_ujemne=punkty_ujemne_suma
+            )
 
         if (ekipa.pozostalo==0):
             ekipy.objects.filter(pk=team_id).update(zgodnosc_wplat=True)
         else:
             ekipy.objects.filter(pk=team_id).update(zgodnosc_wplat=False)
 
-        ekipy.objects.filter(pk=team_id).update(obecnosci=obecnosci_ekipy)
-        ekipy.objects.filter(pk=team_id).update(weryfikacja_zgod=weryfikacja_zgod_ekipy)
-        ekipy.objects.filter(pk=team_id).update(punkty_ujemne=punkty_ujemne_suma)
+        wynik_koncowy_suma = ekipa.test_poczatkowy \
+            + ekipa.punkty_za_trase \
+            + ekipa.punkty_za_odpowiedzi \
+            - punkty_ujemne_suma
 
-        wynik_koncowy_suma = ekipa.test_poczatkowy+ekipa.punkty_za_trase+ekipa.punkty_za_odpowiedzi-punkty_ujemne_suma
-        ekipy.objects.filter(pk=team_id).update(wynik_koncowy=wynik_koncowy_suma)
-
-        ekipy.objects.filter(pk=team_id).update(zaplacono_na_osobe=ekipa.zaplacono/ekipa.ile_osob)
+        ekipy.objects.filter(pk=team_id).update(
+            wynik_koncowy=wynik_koncowy_suma,
+            zaplacono_na_osobe=ekipa.zaplacono/ekipa.ile_osob
+            )
 
     except ekipy.DoesNotExist:
         raise Http404("Team does not exist")
@@ -214,8 +211,7 @@ def odswiez_widok(request, team_id, ekipy):
 
 @user_passes_test(lambda u: u.has_perm('baza.WidokGlowny'))
 def otworz_widok_glowny(request):
-    context = {
-    }
+    context = {}
     return render(request, "baza/start.html", context)
 
 
@@ -223,7 +219,7 @@ def otworz_widok_glowny(request):
 def otworz_ekipy(request):
     iter = 0
     for i in Ekipa.objects.all():
-        iter = iter + 1
+        iter += 1
         Ekipa.objects.filter(pk=i.id).update(lp=iter)
         # !!!
         ekipy = Ekipa
@@ -237,16 +233,15 @@ def otworz_ekipy(request):
 
 @user_passes_test(lambda u: u.has_perm('baza.Ekipy'))
 def otworz_ekipy_trasa(request, trasy):
-    if trasy=='HS':
-        ekipy = Ekipa_HS
-    elif trasy=='W':
-        ekipy = Ekipa_W
-    elif trasy=='R':
-        ekipy = Ekipa_R
-
+    switcher = {
+        'HS': Ekipa_HS,
+        'W': Ekipa_W,
+        'R': Ekipa_R
+        }
+    ekipy = switcher[trasy]
     iter = 0
     for i in ekipy.objects.all():
-        iter = iter + 1
+        iter += 1
         ekipy.objects.filter(pk=i.id).update(lp=iter)
         odswiez_widok(request, i.id, ekipy)
     context = {
@@ -289,7 +284,7 @@ def otworz_szczegoly_ekipy(request, team_id):
 
 @user_passes_test(lambda u: u.has_perm('baza.PunktyHS'))
 def otworz_punkty_HS(request):
-    tworz_punkt()
+    # tworz_punkt()
     context = {
         "Punkty":Punkt_HS.objects.all(),
         }
