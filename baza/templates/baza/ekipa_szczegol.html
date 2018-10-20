@@ -114,16 +114,16 @@
         <tr>
             <th id="memberstable" > imię i nazwisko </th>
             <th id="memberstable" > pesel </th>
-            <th id="memberstable" > adres </th>
-            <th id="memberstable" > obecność</th>
-            <th id="memberstable" >udział</th>
-            <th id="memberstable"> edytuj</th>
+            <th id="memberstable" > wiek </th>
+            <th id="memberstable" > obecność </th>
+            <th id="memberstable" > udział </th>
+            <th id="memberstable" > edytuj </th>
 
          {% for Uczestnik in Uczestnicy %}
          <tr>
            <td id="memberstable" width="15%">{{ Uczestnik.imie_nazwisko }}</td>
            <td id="memberstable" width="5%">{{ Uczestnik.pesel }}</td>
-           <td id="memberstable" width="20%">{{ Uczestnik.adres }}</td>
+           <td id="memberstable" width="20%">{{ Uczestnik.wiek }}</td>
            {% if Uczestnik.obecnosc %}
                <td  id="emptyspace"> <div  id="accept"> obecny </div> </td>
                {% else %}

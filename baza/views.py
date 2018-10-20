@@ -7,9 +7,12 @@ from xlrd import open_workbook
 import xlwt, os
 from .models import *
 
+
+kadra_biegu = []
+
 # !!!
 def tworz_punkt():
-    wb = open_workbook("ex.xls")
+    wb = open_workbook("xls/ex.xls")
     s = wb.sheet_by_index(0)
     data_dict = {
     'numer' : s.cell(0,0).value,
@@ -20,9 +23,109 @@ def tworz_punkt():
     punkt1.save()
 
 
+def importuj_kadre_biegu():
+    csv_file = open_workbook("xls/kadra_biegu.xls")
+    sheet = csv_file.sheet_by_index(0)
+
+    kadra = []
+    line, field = 0, 0
+    for row in sheet.col(0):
+        osoba = {
+            'funkcja' : sheet.cell(line,field).value,
+            'nazwisko' : sheet.cell(line,field+1).value,
+            'mail' : sheet.cell(line,field+2).value,
+            'telefon' : str(sheet.cell(line,field+3).value)[:-2],
+
+        }
+        line += 1
+        kadra.append(osoba)
+    return kadra
+
+
+def importuj_uczestnika(sheet, line, field):
+    data_dict = {
+        'imie_nazwisko' : sheet.cell(line,field).value,
+        'mail' : sheet.cell(line,field+1).value,
+        'pesel' : int(sheet.cell(line,field+2).value),
+    }
+    uczestnik = Uczestnik(**data_dict)
+    uczestnik.save()
+    return uczestnik.id
+
+
+def importuj_ekipe(sheet, line):
+    switcher = {
+        'Starszoharcerska':'HS',
+        'Wędrownicza': 'W',
+        'Rowerowa': 'R'
+        }
+
+    switcher_num = {
+        'HS' : 6,
+        'W': 27,
+        'R': 42
+        }
+
+    switcher_ekipa = {
+        'HS' : Ekipa_HS,
+        'W': Ekipa_W,
+        'R': Ekipa_R
+        }
+
+    trasa = switcher[sheet.cell(line,0).value]
+    data_dict_e = {
+        'trasa' : trasa,
+        'nazwa' : sheet.cell(line,1).value,
+        'telefon' : ('+' + str(int(sheet.cell(line,4).value))),
+    }
+
+    data_dict_u = {
+        'imie_nazwisko' : sheet.cell(line,2).value,
+        'mail' : sheet.cell(line,3).value,
+        'pesel' : int(sheet.cell(line,5).value),
+        'czy_patrolowy' : True,
+    }
+
+    ekipa = switcher_ekipa[trasa](**data_dict_e)
+    ekipa.save()
+    uczestnik = Uczestnik(**data_dict_u)
+    uczestnik.save()
+    id_tab = [uczestnik.id]
+
+    # ile osob w ekipie
+    field = switcher_num[trasa]
+    count = 1
+    while (str(sheet.cell(line,field).value) != "") and (str(sheet.cell(line,field).value) != "1.0") and (count != 8):
+        field += 3
+        count += 1
+
+    for i in range(switcher_num[trasa], switcher_num[trasa]+((count-1)*3), 3):
+        id_tab.append(importuj_uczestnika(sheet, line, i))
+
+    for i in range(len(id_tab)):
+        ekipa.czlonkowie.add(Uczestnik.objects.get(id=id_tab[i]))
+        ekipa.save()
+
+    switcher_ekipa[trasa].objects.filter(pk=ekipa.id).update(ile_osob = count)
+    ekipa.save()
+
+
+def importuj():
+    csv_file = open_workbook("xls/zgloszenia.xls")
+    sheet = csv_file.sheet_by_index(0)
+        # for i in range(1,count):
+        #    importuj_ekipe(sheet, line)
+# TO DO !!!
+    line = 0
+    while (str(sheet.cell(line,0).value) != ""):
+        print(line)
+        print((str(sheet.cell(line,0).value)))
+        line += 1
+
+
 def pobierz_kopie(request):
     eksportuj_wszystko(request)
-    file_path = '/home/bartoszsobkowiak/biegnocny/kopia_zapasowa.xls'
+    file_path = '/home/bartoszsobkowiak/biegnocny/xls/kopia_zapasowa.xls'
     if os.path.exists(file_path):
         with open(file_path, 'rb') as fh:
             response = HttpResponse(fh.read(), content_type="application/vnd.ms-excel")
@@ -159,59 +262,60 @@ def eksportuj_punkty(request, trasa):
 
 
 def odswiez_widok(request, team_id, ekipy):
-    try:
-        weryfikacja_zgod_ekipy = obecnosci_ekipy = True
-        ile_osob = termin_kwota = punkty_ujemne_suma = 0
-        ekipa = ekipy.objects.get(pk=team_id)
+    #try:
+    weryfikacja_zgod_ekipy = obecnosci_ekipy = True
+    ile_osob = termin_kwota = punkty_ujemne_suma = 0
+    ekipa = ekipy.objects.get(pk=team_id)
 
-        for i in ekipa.czlonkowie.all():
-            ile_osob += 1
-            if not i.zgoda_na_udzial:
-                weryfikacja_zgod_ekipy = False
-            if not i.obecnosc:
-                obecnosci_ekipy = False
+    for i in ekipa.czlonkowie.all():
+        ile_osob += 1
+        if not i.zgoda_na_udzial:
+            weryfikacja_zgod_ekipy = False
+        if not i.obecnosc:
+            obecnosci_ekipy = False
 
-        for i in ekipa.termin_wplat.all():
-            termin_kwota = i.kwota
+    for i in ekipa.termin_wplat.all():
+        termin_kwota = i.kwota
 
-        for i in ekipa.punkty_bieg.all():
-            if i.podpowiedz:
-                punkty_ujemne_suma += 1
-            if i.zawieszenie:
-                punkty_ujemne_suma += 2
+    for i in ekipa.punkty_bieg.all():
+        if i.podpowiedz:
+            punkty_ujemne_suma += 1
+        if i.zawieszenie:
+            punkty_ujemne_suma += 2
 
-        ekipy.objects.filter(pk=team_id).update(
-            ile_osob=ile_osob,
-            do_zaplaty=termin_kwota*ile_osob,
-            pozostalo=ekipa.do_zaplaty-ekipa.zaplacono,
-            obecnosci=obecnosci_ekipy,
-            weryfikacja_zgod=weryfikacja_zgod_ekipy,
-            punkty_ujemne=punkty_ujemne_suma
-            )
+    ekipy.objects.filter(pk=team_id).update(
+        ile_osob=ile_osob,
+        do_zaplaty=termin_kwota*ile_osob,
+        pozostalo=ekipa.do_zaplaty-ekipa.zaplacono,
+        obecnosci=obecnosci_ekipy,
+        weryfikacja_zgod=weryfikacja_zgod_ekipy,
+        punkty_ujemne=punkty_ujemne_suma
+        )
 
-        if (ekipa.pozostalo==0):
-            ekipy.objects.filter(pk=team_id).update(zgodnosc_wplat=True)
-        else:
-            ekipy.objects.filter(pk=team_id).update(zgodnosc_wplat=False)
+    if (ekipa.pozostalo==0):
+        ekipy.objects.filter(pk=team_id).update(zgodnosc_wplat=True)
+    else:
+        ekipy.objects.filter(pk=team_id).update(zgodnosc_wplat=False)
 
-        wynik_koncowy_suma = ekipa.test_poczatkowy \
-            + ekipa.punkty_za_trase \
-            + ekipa.punkty_za_odpowiedzi \
-            - punkty_ujemne_suma
+    wynik_koncowy_suma = ekipa.test_poczatkowy \
+        + ekipa.punkty_za_trase \
+        + ekipa.punkty_za_odpowiedzi \
+        - punkty_ujemne_suma
 
-        ekipy.objects.filter(pk=team_id).update(
-            wynik_koncowy=wynik_koncowy_suma,
-            zaplacono_na_osobe=ekipa.zaplacono/ekipa.ile_osob
-            )
+    ekipy.objects.filter(pk=team_id).update(
+        wynik_koncowy=wynik_koncowy_suma,
+        zaplacono_na_osobe=ekipa.zaplacono/ekipa.ile_osob
+        )
 
-    except ekipy.DoesNotExist:
-        raise Http404("Team does not exist")
+    #except ekipy.DoesNotExist:
+    #    raise Http404("Team does not exist")
     return ekipa
 
 
 @user_passes_test(lambda u: u.has_perm('baza.WidokGlowny'))
 def otworz_widok_glowny(request):
-    context = {}
+    osoby = kadra_biegu
+    context = {"Kadra": osoby}
     return render(request, "baza/start.html", context)
 
 
@@ -223,7 +327,7 @@ def otworz_ekipy(request):
         Ekipa.objects.filter(pk=i.id).update(lp=iter)
         # !!!
         ekipy = Ekipa
-        odswiez_widok(request, i.id, ekipy)
+        for j in range(4): odswiez_widok(request,  i.id, ekipy)
     context = {
         "Uczestnik":Uczestnik.objects.all(),
         "Ekipy":Ekipa.objects.all()
@@ -243,7 +347,7 @@ def otworz_ekipy_trasa(request, trasy):
     for i in ekipy.objects.all():
         iter += 1
         ekipy.objects.filter(pk=i.id).update(lp=iter)
-        odswiez_widok(request, i.id, ekipy)
+        for j in range(4): odswiez_widok(request,  i.id, ekipy)
     context = {
         "Uczestnik":Uczestnik.objects.all(),
         "Ekipy":ekipy.objects.all()
@@ -269,7 +373,7 @@ def otworz_ekipy_R(request):
 @user_passes_test(lambda u: u.has_perm('baza.Ekipy'))
 def otworz_szczegoly_ekipy(request, team_id):
     ekipy = Ekipa
-    ekipa = odswiez_widok(request, team_id, ekipy)
+    for i in range(5): ekipa = odswiez_widok(request, team_id, ekipy)
     context = {
         "ekipa": ekipa,
         "Uczestnik":Uczestnik.objects.all(), # wszyscy uczestnicy
@@ -284,7 +388,6 @@ def otworz_szczegoly_ekipy(request, team_id):
 
 @user_passes_test(lambda u: u.has_perm('baza.PunktyHS'))
 def otworz_punkty_HS(request):
-    # tworz_punkt()
     context = {
         "Punkty":Punkt_HS.objects.all(),
         }
@@ -325,3 +428,17 @@ def otworz_kwadraty(request, team_id):
         "Kwadraty":Kwadraty.objects.all(),
     }
     return render(request, "baza/kwadraty.html", context)
+
+
+@user_passes_test(lambda u: u.has_perm('baza.WidokGlowny'))
+def otworz_instrukcje(request):
+    context = {}
+    return render(request, "baza/instrukcje.html", context)
+
+
+@user_passes_test(lambda u: u.has_perm('baza.Ekipy'))
+def otworz_ustawienia(request):
+    global kadra_biegu
+    kadra_biegu = importuj_kadre_biegu()
+    context = {"Kadra": kadra_biegu}
+    return render(request, "baza/ustawienia.html", context)

@@ -17,6 +17,8 @@ urlpatterns = [
     path("punkty/<int:punkt_id>", views.otworz_szczegoly_punktu),
 
     path("kwadraty",views.otworz_kwadraty),
+    path("instrukcje",views.otworz_instrukcje),
+    path("ustawienia",views.otworz_ustawienia),
 
     #path("pobierz_kopie",views.pobierz_kopie),
     #path("pobierz_kopie/<str:trasa>",views.pobierz_punkty),
