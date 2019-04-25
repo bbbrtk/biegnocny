@@ -21,3 +21,5 @@ admin.site.register(Punkt_R)
 admin.site.register(Zgloszenie_HS)
 admin.site.register(Zgloszenie_W)
 admin.site.register(Zgloszenie_R)
+
+admin.site.register(PlikCSV)

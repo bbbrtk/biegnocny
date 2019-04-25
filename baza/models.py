@@ -3,7 +3,6 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-#class punkty startowe?
 
 class Punkt (models.Model):
     id =  models.AutoField(primary_key=True)
@@ -20,6 +19,7 @@ class Punkt (models.Model):
     pytanie = models.CharField(max_length=256, blank=True)
     odpowiedz = models.CharField(max_length=256, blank=True)
     dojscie = models.CharField(max_length=256, blank=True)
+    foto = models.ImageField(blank=True, upload_to='baza/static/foto/', default='baza/static/foto/{self.id}.jpg')
 
     punktowy = models.CharField(max_length=64, blank=True)
     uwagi = models.CharField(max_length=256, blank=True)
@@ -30,11 +30,14 @@ class Punkt (models.Model):
     class Meta:
         ordering = ('numer',)
 
+
 class Punkt_HS (Punkt):
     trasa =  models.CharField(max_length=2, default='HS', blank=True)
 
+
 class Punkt_W (Punkt):
     trasa =  models.CharField(max_length=2, default='W', blank=True)
+
 
 class Punkt_R (Punkt):
     trasa =  models.CharField(max_length=2, default='R', blank=True)
@@ -56,15 +59,17 @@ class Zgloszenie (models.Model):
             nazwa = i.nazwa
         return f"z_{self.punkt}_{self.id}_{nazwa}"
 
+
 class Zgloszenie_HS (Zgloszenie):
     punkt = models.ForeignKey(Punkt_HS, on_delete=models.CASCADE )
+
 
 class Zgloszenie_W (Zgloszenie):
     punkt = models.ForeignKey(Punkt_W, on_delete=models.CASCADE )
 
+
 class Zgloszenie_R (Zgloszenie):
     punkt = models.ForeignKey(Punkt_R, on_delete=models.CASCADE )
-
 
 
 class Termin (models.Model):
@@ -93,8 +98,9 @@ class Uczestnik(models.Model):
     imie_nazwisko = models.CharField(max_length=64)
     id =  models.AutoField(primary_key=True)
     pesel = models.CharField(max_length=64)
-    mail = models.EmailField(max_length=64)
-    adres = models.CharField(max_length=64)
+    wiek = models.CharField(max_length=2, default='10', blank=True)
+    mail = models.EmailField(max_length=64, blank=True)
+    adres = models.CharField(max_length=64, blank=True)
     czy_patrolowy = models.BooleanField(default=False)
     obecnosc = models.BooleanField(default=False)
     zgoda_na_udzial = models.BooleanField(default=False)
@@ -125,10 +131,10 @@ class Ekipa(models.Model):
     trasa =  models.CharField(max_length=2, choices=TRASY, default='HS')
     telefon =  models.CharField(max_length=64, default='')
     zaplacono = models.FloatField(default=0)
-    termin_wplat = models.ManyToManyField(Termin)
+    termin_wplat = models.ManyToManyField(Termin, blank=True)
     # czlonkowie
     czlonkowie = models.ManyToManyField(Uczestnik)
-    ile_osob = models.IntegerField(default=0)
+    ile_osob = models.IntegerField(default=1)
     # finanse
     lp = models.IntegerField(default=0)
     do_zaplaty = models.FloatField(default=0)
@@ -165,8 +171,10 @@ class Ekipa(models.Model):
 class Ekipa_HS (Ekipa):
     trasy =  models.CharField(max_length=2, default='HS', blank=True)
 
+
 class Ekipa_W (Ekipa):
     trasy =  models.CharField(max_length=2, default='W', blank=True)
+
 
 class Ekipa_R (Ekipa):
     trasy =  models.CharField(max_length=2, default='R', blank=True)
@@ -193,13 +201,20 @@ class Profile (models.Model):
             ('Uczestnicy', 'Wyświetlanie uczestników'),
         )
 
-
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         Profile.objects.create(user=instance)
+
 """
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
 """
+
+class PlikCSV (models.Model):
+    nazwa = models.CharField(max_length=50, default='nazwij_swoj_plik')
+    plik = models.FileField(upload_to='xls/')
+
+    def __str__(self):
+        return f"{self.tytul}"
